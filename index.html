@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Super Sophisticated App</title>
+        <style>
+        .container {
+            margin: 40px auto;
+            width: 80%;
+        }
+
+        hr {
+            width: 400px;
+            margin-left: 0;
+        }
+        h3 {
+            display: inline-block;
+        }
+        #static {
+            color: red;
+        }
+        #dynamic {
+            color: green;
+        }
+    </style>
+    </head>
+    <body>
+        <div class='container' id='container'>
+            <h1>Welcome to this Super Sophisticated App</h1>
+            <span>Some static data: </span><h3 id="static">this is hard-coded in
+                index.html</h3>
+            <hr />
+            <span>Data from MongoDB: </span><h3 id="dynamic">Loading...</h3>
+            <hr />
+        </div>
+        <script>
+            async function fetchData() {
+                try {
+                    const response = await fetch('/fetch-data', {
+                        method: "GET",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const jsonResponse = await response.json();
+                    // Check if jsonResponse is an array of objects
+                    if (Array.isArray(jsonResponse) && jsonResponse.length > 0) {
+                        const dynamicContent = jsonResponse.map(item => `<p>${item.firstName} ${item.lastName}, Age: ${item.age}, Email: ${item.email}</p>`).join('');
+                        document.getElementById('dynamic').innerHTML = dynamicContent;
+                    } else {
+                        document.getElementById('dynamic').textContent = 'No data found';
+                    }
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('dynamic').textContent = 'Failed to load data';
+                }
+            }
+        
+            window.onload = fetchData;
+        </script>
+        
+    </body>
+</html>
